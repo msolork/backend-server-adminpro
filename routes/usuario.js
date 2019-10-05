@@ -11,7 +11,11 @@ var Usuario = require('../models/usuario');
 // ==========================================================
 app.get('/', (req, res, next) => {
 
+    let desde = req.query.desde || 0;
+    desde = Number(desde);
     Usuario.find({}, 'nombre email img role')
+        .skip(desde)
+        .limit(5)
         .exec(
             (err, usuarios) => {
                 if (err) {
@@ -22,10 +26,15 @@ app.get('/', (req, res, next) => {
                     });
                 }
 
-                return res.status(200).json({
-                    ok: true,
-                    usuarios: usuarios
+                Usuario.count({}, (err, conteo) => {
+                    return res.status(200).json({
+                        ok: true,
+                        usuarios: usuarios,
+                        total: conteo
+                    });
                 });
+
+
             }
         );
 });
@@ -117,7 +126,7 @@ app.put('/:id', middlewareAutenticacion.verificaToken, (req, res) => {
 // ==========================================================
 app.delete('/:id', middlewareAutenticacion.verificaToken, (req, res) => {
   let id = req.params.id;
-  Usuario.findByIdAndRemove(id, (err, usuarioEleminado) => {
+  Usuario.findByIdAndRemove(id, (err, usuarioEliminado) => {
       if (err) {
           return res.status(500).json({
               ok: false,
@@ -126,7 +135,7 @@ app.delete('/:id', middlewareAutenticacion.verificaToken, (req, res) => {
           });
       }
 
-      if (!usuarioEleminado) {
+      if (!usuarioEliminado) {
           return res.status(400).json({
               ok: false,
               mensaje: 'No existe un usuario con ese id',
@@ -136,7 +145,7 @@ app.delete('/:id', middlewareAutenticacion.verificaToken, (req, res) => {
 
       return res.status(200).json({
           ok: true,
-          usuario: usuarioEleminado
+          usuario: usuarioEliminado
       });
   });
 });
