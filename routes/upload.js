@@ -91,7 +91,7 @@ function subirPorTipo(tipo, id, nombreArchivo, res){
             usuario.img = nombreArchivo;
             usuario.save((err, usuarioActualizado) => {
 
-                
+
 
                 usuarioActualizado.password = ':D';
 
